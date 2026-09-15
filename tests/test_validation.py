@@ -73,6 +73,22 @@ class ValidationTests(unittest.TestCase):
         errors = validate_retrieval_chunk(payload)
         self.assertIn("invalid review_state: invalid", errors)
 
+    def test_knowledge_record_invalid_transition_fails(self) -> None:
+        payload = {
+            "record_id": "record_1",
+            "source_ids": ["source_1"],
+            "title": "Title",
+            "summary": "Summary",
+            "concepts": [],
+            "candidate_claims": [],
+            "authority_class": "advisory",
+            "relationships": [],
+            "review_state": "approved",
+            "decision_provenance": "REVIEWED: PR #2",
+        }
+        errors = validate_knowledge_record(payload, from_state="captured")
+        self.assertIn("invalid transition: captured -> approved", errors)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -18,6 +18,13 @@ class SourceArtifact:
 
 
 @dataclass(frozen=True)
+class KnowledgeRelationship:
+    relation_type: str
+    target_id: str
+    note: str | None = None
+
+
+@dataclass(frozen=True)
 class KnowledgeRecord:
     record_id: str
     source_ids: tuple[str, ...]
@@ -26,7 +33,7 @@ class KnowledgeRecord:
     concepts: tuple[str, ...] = field(default_factory=tuple)
     candidate_claims: tuple[str, ...] = field(default_factory=tuple)
     authority_class: str = "unknown"
-    relationships: tuple[dict[str, str], ...] = field(default_factory=tuple)
+    relationships: tuple[KnowledgeRelationship, ...] = field(default_factory=tuple)
     review_state: str = "proposed"
     decision_provenance: str | None = None
 
