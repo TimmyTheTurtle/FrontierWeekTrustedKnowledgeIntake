@@ -1,5 +1,19 @@
+# This workflow is a small, one-time learning example for repository issue #1.
+# It demonstrates how GitHub can react to issue comments and pull requests,
+# run a deterministic check, and write the result back to the issue.
+# It is not a reusable issue-orchestration framework for future work.
+# Issue: https://github.com/TimmyTheTurtle/FrontierWeekTrustedKnowledgeIntake/issues/1
+#
+# Beginner learning references:
+# - Workflow syntax: https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions
+# - Workflow events: https://docs.github.com/actions/using-workflows/events-that-trigger-workflows
+# - GitHub Script: https://github.com/actions/github-script
 name: Repository initialization gates
 
+# These events can start the workflow:
+# - workflow_dispatch: a person manually seeds the existing issue.
+# - issue_comment: a human approval comment unlocks the next checkpoint.
+# - pull_request: a proposed change receives a scope check.
 on:
   workflow_dispatch:
     inputs:
@@ -12,24 +26,34 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+# Give the workflow only the permissions it needs.
+# Beginner reference: https://docs.github.com/actions/using-jobs/assigning-permissions-to-jobs
 permissions:
   contents: read
   issues: write
   pull-requests: read
 
+# Keep two runs for the same issue or pull request from racing each other.
+# Beginner reference: https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions#concurrency
 concurrency:
   group: initialization-gates-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
   cancel-in-progress: false
 
+# This is intentionally fixed to the existing initialization issue.
+# A future task would need a separately designed workflow.
 env:
   INITIALIZATION_ISSUE: "1"
 
 jobs:
+  # A manual run posts the first checkpoint because issue #1 existed before
+  # this workflow was added.
   seed-initialization:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Seed the inspection checkpoint
+        # github-script lets a workflow call the GitHub API with JavaScript.
+        # Beginner reference: https://github.com/actions/github-script
         uses: actions/github-script@v7
         with:
           script: |
@@ -39,6 +63,8 @@ jobs:
               return;
             }
 
+            // A hidden marker lets us update one bot comment instead of
+            // creating a duplicate every time the workflow is run.
             const marker = '<!-- initialization-gate:phase-0 -->';
             const body = `${marker}
             ## Initialization checkpoint 0: inspect and propose
@@ -53,6 +79,8 @@ jobs:
 
             This checkpoint is specific to repository initialization for issue #${issueNumber}.`;
 
+            // Read the existing comments so the result is repeatable.
+            // API reference: https://docs.github.com/rest/issues/comments
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -77,6 +105,8 @@ jobs:
               });
             }
 
+  # This job listens for the three exact approval phrases written in issue #1.
+  # The issue author remains the human authority for advancing the work.
   approval-checkpoint:
     if: >-
       github.event_name == 'issue_comment' &&
@@ -88,6 +118,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Advance the approved initialization checkpoint
+        # Beginner reference for expressions used in the job filter:
+        # https://docs.github.com/actions/learn-github-actions/expressions
         uses: actions/github-script@v7
         with:
           script: |
@@ -137,6 +169,7 @@ jobs:
               }
             }[approval];
 
+            // Use the same marker/update pattern for each checkpoint comment.
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -161,6 +194,8 @@ jobs:
               });
             }
 
+  # This job runs only for a pull request that appears related to issue #1.
+  # It does not decide whether the design is good; it checks file-level scope.
   validate-initialization-pull-request:
     if: >-
       github.event_name == 'pull_request' &&
@@ -169,16 +204,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the proposed change
+        # fetch-depth: 0 makes the main branch available for comparison.
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Validate initialization file scope
+        # The Python script prints a Markdown report and returns a failing
+        # exit code when the pull request leaves the initialization boundary.
         id: scope
         continue-on-error: true
         run: python scripts/validate_initialization_scope.py origin/main...HEAD > initialization-scope-report.md
 
       - name: Report the scope result on issue #1
+        # The report is written back to the same persistent issue.
         uses: actions/github-script@v7
         env:
           SCOPE_OUTCOME: ${{ steps.scope.outcome }}
@@ -219,5 +258,19 @@ jobs:
             }
 
       - name: Fail when the proposed change leaves initialization scope
+        # continue-on-error above lets the workflow post the explanation first;
+        # this step then makes the GitHub check fail when the scope is invalid.
         if: steps.scope.outcome == 'failure'
         run: exit 1
+
+# More beginner references for the exact ideas used here:
+# - GH-600 study guide: https://learn.microsoft.com/credentials/certifications/resources/study-guides/gh-600
+# - Foundations of Agentic AI in GitHub: https://learn.microsoft.com/en-us/training/modules/foundations-agentic-ai/
+# - Designing Agent Architecture and SDLC Integration: https://learn.microsoft.com/en-us/training/modules/design-agent-architecture-integration/
+# - Tooling, MCP, and Agent Execution Environments: https://learn.microsoft.com/en-us/training/modules/agent-tooling-mcp-execution-environments/
+# - GitHub Actions learning path: https://learn.microsoft.com/training/paths/github-actions/
+# - Implement GitHub Actions: https://learn.microsoft.com/training/modules/implement-github-actions/
+# - Automate GitHub by using GitHub Script: https://learn.microsoft.com/training/modules/automate-github-using-github-script/
+# - Build continuous integration workflows: https://learn.microsoft.com/training/modules/github-actions-ci/
+# - GitHub Copilot agent mode: https://learn.microsoft.com/training/modules/github-copilot-agent-mode/
+# - Pull requests: https://learn.microsoft.com/training/modules/manage-changes-pull-requests-github/
