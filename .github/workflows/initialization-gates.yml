@@ -1,0 +1,223 @@
+name: Repository initialization gates
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Existing initialization issue to seed
+        required: true
+        default: "1"
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: initialization-gates-${{ github.event.issue.number || github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+env:
+  INITIALIZATION_ISSUE: "1"
+
+jobs:
+  seed-initialization:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Seed the inspection checkpoint
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = Number('${{ inputs.issue_number }}');
+            if (issueNumber !== Number(process.env.INITIALIZATION_ISSUE)) {
+              core.setFailed(`This workflow is locked to issue #${process.env.INITIALIZATION_ISSUE}.`);
+              return;
+            }
+
+            const marker = '<!-- initialization-gate:phase-0 -->';
+            const body = `${marker}
+            ## Initialization checkpoint 0: inspect and propose
+
+            The coding agent may inspect the repository, read the referenced context, and post a bounded initialization plan.
+
+            No files may be edited during this checkpoint.
+
+            When the plan is ready, the agent must stop and wait for the human approval comment:
+
+            APPROVE: PLAN
+
+            This checkpoint is specific to repository initialization for issue #${issueNumber}.`;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              per_page: 100,
+            });
+            const existing = comments.find(comment => comment.body?.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body,
+              });
+            }
+
+  approval-checkpoint:
+    if: >-
+      github.event_name == 'issue_comment' &&
+      github.event.issue.number == 1 &&
+      github.event.issue.pull_request == null &&
+      (github.event.comment.body == 'APPROVE: PLAN' ||
+       github.event.comment.body == 'APPROVE: DOCUMENTATION' ||
+       github.event.comment.body == 'APPROVE: SCAFFOLDING')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Advance the approved initialization checkpoint
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const approval = context.payload.comment.body.trim();
+            const issueAuthor = context.payload.issue.user.login;
+
+            if (context.actor !== issueAuthor) {
+              core.setFailed(`Only the issue author (${issueAuthor}) can approve a checkpoint.`);
+              return;
+            }
+
+            const checkpoints = {
+              'APPROVE: PLAN': {
+                marker: '<!-- initialization-gate:phase-1 -->',
+                body: `<!-- initialization-gate:phase-1 -->
+                ## Initialization checkpoint 1 unlocked: documentation
+
+                The plan is approved. The coding agent may now create or revise only the documentation and repository-contract files listed in issue #1.
+
+                It must stop after that work and report:
+
+                DOCUMENTATION READY — AWAITING HUMAN REVIEW
+
+                The next human approval is APPROVE: DOCUMENTATION.`
+              },
+              'APPROVE: DOCUMENTATION': {
+                marker: '<!-- initialization-gate:phase-2 -->',
+                body: `<!-- initialization-gate:phase-2 -->
+                ## Initialization checkpoint 2 unlocked: minimal scaffolding
+
+                The documentation is approved. The coding agent may now add only the minimal schemas, types, deterministic helpers, validation, and focused tests authorized by issue #1.
+
+                It must stop before deterministic Markdown ingestion and report:
+
+                INITIALIZATION SCAFFOLDING READY — AWAITING HUMAN REVIEW
+
+                The next human approval is APPROVE: SCAFFOLDING.`
+              },
+              'APPROVE: SCAFFOLDING': {
+                marker: '<!-- initialization-gate:phase-3 -->',
+                body: `<!-- initialization-gate:phase-3 -->
+                ## Initialization checkpoint 3 unlocked: verify and report
+
+                The minimal scaffolding is approved. The coding agent may run the repository's available checks and provide the final initialization report.
+
+                It must not begin Stage 1 implementation. A human must review the final diff and verification report before issue #1 is considered complete.`
+              }
+            }[approval];
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find(comment => comment.body?.includes(checkpoints.marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: checkpoints.body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: checkpoints.body,
+              });
+            }
+
+  validate-initialization-pull-request:
+    if: >-
+      github.event_name == 'pull_request' &&
+      (contains(github.event.pull_request.title, 'initialization') ||
+       contains(github.event.pull_request.body, '#1'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the proposed change
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate initialization file scope
+        id: scope
+        continue-on-error: true
+        run: python scripts/validate_initialization_scope.py origin/main...HEAD > initialization-scope-report.md
+
+      - name: Report the scope result on issue #1
+        uses: actions/github-script@v7
+        env:
+          SCOPE_OUTCOME: ${{ steps.scope.outcome }}
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('initialization-scope-report.md', 'utf8');
+            const marker = '<!-- initialization-gate:pull-request-scope -->';
+            const body = `${marker}
+            ## Initialization pull request scope check
+
+            Pull request #${context.payload.pull_request.number}: **${process.env.SCOPE_OUTCOME === 'success' ? 'passed' : 'requires review'}**
+
+            ${report}`;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(process.env.INITIALIZATION_ISSUE),
+              per_page: 100,
+            });
+            const existing = comments.find(comment => comment.body?.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: Number(process.env.INITIALIZATION_ISSUE),
+                body,
+              });
+            }
+
+      - name: Fail when the proposed change leaves initialization scope
+        if: steps.scope.outcome == 'failure'
+        run: exit 1
