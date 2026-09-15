@@ -89,6 +89,41 @@ class ValidationTests(unittest.TestCase):
         errors = validate_knowledge_record(payload, from_state="captured")
         self.assertIn("invalid transition: captured -> approved", errors)
 
+    def test_knowledge_record_noop_transition_is_allowed(self) -> None:
+        payload = {
+            "record_id": "record_1",
+            "source_ids": ["source_1"],
+            "title": "Title",
+            "summary": "Summary",
+            "concepts": [],
+            "candidate_claims": [],
+            "authority_class": "advisory",
+            "relationships": [],
+            "review_state": "reviewed",
+            "decision_provenance": None,
+        }
+        self.assertEqual(validate_knowledge_record(payload, from_state="reviewed"), [])
+
+    def test_terminal_state_explicit_empty_override_fails(self) -> None:
+        payload = {
+            "record_id": "record_1",
+            "source_ids": ["source_1"],
+            "title": "Title",
+            "summary": "Summary",
+            "concepts": [],
+            "candidate_claims": [],
+            "authority_class": "advisory",
+            "relationships": [],
+            "review_state": "approved",
+            "decision_provenance": "REVIEWED: PR #2",
+        }
+        errors = validate_knowledge_record(
+            payload,
+            from_state="reviewed",
+            human_decision_evidence="",
+        )
+        self.assertIn("human decision evidence required for review_state: approved", errors)
+
 
 if __name__ == "__main__":
     unittest.main()

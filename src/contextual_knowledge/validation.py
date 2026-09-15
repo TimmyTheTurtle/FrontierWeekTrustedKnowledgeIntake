@@ -59,10 +59,13 @@ def validate_knowledge_record(
     if to_state and to_state not in REVIEW_STATES:
         errors.append(f"invalid review_state: {to_state}")
 
-    if from_state and to_state and not can_transition(from_state, to_state):
+    if from_state and to_state and from_state != to_state and not can_transition(from_state, to_state):
         errors.append(f"invalid transition: {from_state} -> {to_state}")
 
-    decision_evidence = human_decision_evidence or payload.get("decision_provenance")
+    if human_decision_evidence is not None:
+        decision_evidence = human_decision_evidence
+    else:
+        decision_evidence = payload.get("decision_provenance")
     if to_state and requires_human_decision(to_state) and not decision_evidence:
         errors.append(f"human decision evidence required for review_state: {to_state}")
 
