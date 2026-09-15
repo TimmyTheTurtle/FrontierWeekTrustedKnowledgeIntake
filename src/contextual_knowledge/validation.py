@@ -10,6 +10,7 @@ from .schemas import (
     RETRIEVAL_CHUNK_REQUIRED_FIELDS,
     REVIEW_STATES,
     SOURCE_ARTIFACT_REQUIRED_FIELDS,
+    TRUST_CLASSIFICATIONS,
 )
 
 
@@ -36,7 +37,11 @@ def _missing_fields(
 
 def validate_source_artifact(payload: dict[str, Any]) -> list[str]:
     """Return validation errors for source artifacts."""
-    return [f"missing field: {name}" for name in _missing_fields(payload, SOURCE_ARTIFACT_REQUIRED_FIELDS)]
+    errors = [f"missing field: {name}" for name in _missing_fields(payload, SOURCE_ARTIFACT_REQUIRED_FIELDS)]
+    classification = payload.get("trust_classification")
+    if classification and classification not in TRUST_CLASSIFICATIONS:
+        errors.append(f"invalid trust_classification: {classification}")
+    return errors
 
 
 def validate_knowledge_record(

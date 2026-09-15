@@ -13,6 +13,8 @@ REVIEW_STATES = (
 
 TERMINAL_REVIEW_STATES = ("approved", "revised", "quarantined", "rejected")
 
+TRUST_CLASSIFICATIONS = ("untrusted", "trusted", "quarantined", "unknown")
+
 SOURCE_ARTIFACT_REQUIRED_FIELDS = (
     "source_id",
     "origin",

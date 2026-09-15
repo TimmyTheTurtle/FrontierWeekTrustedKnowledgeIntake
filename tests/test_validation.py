@@ -27,6 +27,20 @@ class ValidationTests(unittest.TestCase):
         }
         self.assertTrue(validate_source_artifact(payload))
 
+    def test_invalid_source_artifact_trust_classification_fails(self) -> None:
+        payload = {
+            "source_id": "source_1",
+            "origin": "notes.md",
+            "content_type": "text/markdown",
+            "captured_at": "2026-09-15T00:00:00Z",
+            "content_hash": "abc",
+            "license_note": "open",
+            "trust_classification": "external",
+            "raw_reference": "data/samples/notes.md",
+        }
+        errors = validate_source_artifact(payload)
+        self.assertIn("invalid trust_classification: external", errors)
+
     def test_terminal_knowledge_state_requires_human_evidence(self) -> None:
         payload = {
             "record_id": "record_1",
