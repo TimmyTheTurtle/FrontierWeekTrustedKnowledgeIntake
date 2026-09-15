@@ -15,5 +15,6 @@ Trusted Knowledge Intake:
 - Agents may propose; humans decide approval.
 - Deterministic components own hashing, validation, and state transitions.
 
-## Initialization stop point
-This phase does not implement ingestion, agents, retrieval, RAG, external integrations, Azure provisioning, or deployment.
+## Current stop point
+Repository initialization is complete. Stage 1 ingestion, agents, retrieval,
+RAG, external integrations, Azure provisioning, and deployment have not begun.

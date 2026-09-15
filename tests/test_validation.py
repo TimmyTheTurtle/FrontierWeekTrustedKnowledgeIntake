@@ -9,6 +9,10 @@ from contextual_knowledge.validation import (
 
 class ValidationTests(unittest.TestCase):
     def test_valid_source_artifact_has_no_errors(self) -> None:
+        # A complete source-artifact payload has the minimum provenance needed
+        # to identify, preserve, and describe an original captured source.
+        # This Stage 0 check validates shape and allowed trust values only; it
+        # does not yet read a file or recompute its content hash.
         payload = {
             "source_id": "source_1",
             "origin": "notes.md",
@@ -22,12 +26,16 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(validate_source_artifact(payload), [])
 
     def test_missing_source_artifact_field_fails(self) -> None:
+        # A source with only an ID has no usable provenance, integrity, or raw
+        # content reference. The validator must return one or more errors.
         payload = {
             "source_id": "source_1",
         }
         self.assertTrue(validate_source_artifact(payload))
 
     def test_invalid_source_artifact_trust_classification_fails(self) -> None:
+        # Trust is constrained to the project vocabulary. An arbitrary label
+        # such as "external" must not silently become a valid trust state.
         payload = {
             "source_id": "source_1",
             "origin": "notes.md",
@@ -42,6 +50,8 @@ class ValidationTests(unittest.TestCase):
         self.assertIn("invalid trust_classification: external", errors)
 
     def test_terminal_knowledge_state_requires_human_evidence(self) -> None:
+        # Even when a record otherwise has all required fields, approval is
+        # invalid without evidence of an explicit human decision.
         payload = {
             "record_id": "record_1",
             "source_ids": ["source_1"],
@@ -58,6 +68,8 @@ class ValidationTests(unittest.TestCase):
         self.assertIn("human decision evidence required for review_state: approved", errors)
 
     def test_terminal_knowledge_state_accepts_payload_decision_provenance(self) -> None:
+        # A reviewed record may enter approved when its payload carries human
+        # decision provenance. This is the positive approval-boundary case.
         payload = {
             "record_id": "record_1",
             "source_ids": ["source_1"],
@@ -73,6 +85,8 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(validate_knowledge_record(payload, from_state="reviewed"), [])
 
     def test_chunk_invalid_state_fails(self) -> None:
+        # Retrieval chunks also use the shared review-state vocabulary, so an
+        # invented state cannot make a chunk appear ready for trusted use.
         payload = {
             "chunk_id": "chunk_1",
             "source_id": "source_1",
@@ -88,6 +102,8 @@ class ValidationTests(unittest.TestCase):
         self.assertIn("invalid review_state: invalid", errors)
 
     def test_knowledge_record_invalid_transition_fails(self) -> None:
+        # Decision provenance alone is not enough: the record must also follow
+        # the required lifecycle and cannot skip from captured to approved.
         payload = {
             "record_id": "record_1",
             "source_ids": ["source_1"],
@@ -104,6 +120,8 @@ class ValidationTests(unittest.TestCase):
         self.assertIn("invalid transition: captured -> approved", errors)
 
     def test_knowledge_record_noop_transition_is_allowed(self) -> None:
+        # Revalidating a record already in reviewed does not move it and is
+        # therefore permitted; this avoids rejecting harmless repeat checks.
         payload = {
             "record_id": "record_1",
             "source_ids": ["source_1"],
@@ -119,6 +137,8 @@ class ValidationTests(unittest.TestCase):
         self.assertEqual(validate_knowledge_record(payload, from_state="reviewed"), [])
 
     def test_terminal_state_explicit_empty_override_fails(self) -> None:
+        # A caller cannot bypass payload provenance by explicitly supplying an
+        # empty human-decision override for an approval transition.
         payload = {
             "record_id": "record_1",
             "source_ids": ["source_1"],
