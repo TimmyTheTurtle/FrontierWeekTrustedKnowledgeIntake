@@ -196,45 +196,54 @@ flowchart TB
 
 ## 6. Product stages and competition capability gates
 
-Product delivery stages and course/competition capability gates are related but
-not interchangeable. This planning map shows where a product stage is expected
-to create evidence for one or more gates. An arrow does **not** mean a gate is
-satisfied, and the official competition requirements must be verified before
-claiming any gate.
+Product delivery stages are the outer roadmap. Course/competition capabilities
+are a recurring engineering loop applied inside that roadmap. The two lanes are
+shown separately on purpose: neither is a substitute for the other.
 
 ```mermaid
 flowchart LR
-    subgraph product[Product stages]
+    subgraph product[Outer product roadmap]
         direction TB
-        P0[Stage 0: repository foundation]
+        P0[Stage 0: foundation]
         P1[Stage 1: deterministic ingestion]
         P2[Stage 2: Intake Analyst]
-        P3[Stage 3: Knowledge Steward and human review]
+        P3[Stage 3: Steward and human review]
         P4[Stage 4: operational evidence]
         P5[Stage 5: optional retrieval and deployment]
     end
 
-    subgraph gates[Competition or course capability gates]
+    subgraph capabilities[Course or competition capability loop]
         direction TB
         Setup[Setup]
         Build[Build]
         Workflow[Workflow]
         Monitor[Monitor]
         Evaluate[Evaluate]
-        Deploy[Deploy: separately verified requirements]
+        Deploy[Deploy: separately verified]
+        Setup --> Build --> Workflow --> Monitor --> Evaluate
+        Evaluate -. improve .-> Build
     end
-
-    P0 --> Setup
-    P1 --> Build
-    P2 --> Build
-    P3 --> Build
-    P3 --> Workflow
-    P4 --> Workflow
-    P4 --> Monitor
-    P4 --> Evaluate
-    P5 -. only if deployment is adopted .-> Deploy
 ```
 
+**Product-roadmap caption.** Stages 0–5 say what the product gains next. They
+are ordered delivery milestones, not a claim that every competition capability
+has been completed.
+
+**Capability-loop caption.** `Setup` is a later Foundry prerequisite, not a
+claim about Stage 0 or Stage 1. Once an agent or component exists, it needs its
+own `Build → Workflow → Monitor → Evaluate → improve` loop. That applies to the
+Intake Analyst in Stage 2 and again to the Knowledge Steward/human-review
+package in Stage 3. Stage 4 makes monitoring and evaluation systematic across
+the system and uses the resulting evidence to improve both components.
+
+**Deployment caption.** `Deploy` is not the next loop step. It is a separate,
+optional release decision with separately verified requirements.
+
+The lanes deliberately have no connecting arrows. Their relationship is
+explained by these captions; nothing in this diagram means a competition
+requirement is satisfied. Official requirements must be verified before any
+completion claim.
+
 The immediate next product milestone remains Stage 1. It should demonstrate
-deterministic ingestion; it must not be expanded just to check unrelated
+deterministic ingestion and must not be expanded just to check unrelated
 competition boxes.
