@@ -38,9 +38,25 @@ class ValidationTests(unittest.TestCase):
             "authority_class": "advisory",
             "relationships": [],
             "review_state": "approved",
+            "decision_provenance": None,
         }
         errors = validate_knowledge_record(payload, from_state="reviewed")
         self.assertIn("human decision evidence required for review_state: approved", errors)
+
+    def test_terminal_knowledge_state_accepts_payload_decision_provenance(self) -> None:
+        payload = {
+            "record_id": "record_1",
+            "source_ids": ["source_1"],
+            "title": "Title",
+            "summary": "Summary",
+            "concepts": [],
+            "candidate_claims": [],
+            "authority_class": "advisory",
+            "relationships": [],
+            "review_state": "approved",
+            "decision_provenance": "REVIEWED: PR #2",
+        }
+        self.assertEqual(validate_knowledge_record(payload, from_state="reviewed"), [])
 
     def test_chunk_invalid_state_fails(self) -> None:
         payload = {

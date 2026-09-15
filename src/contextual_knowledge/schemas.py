@@ -34,6 +34,7 @@ KNOWLEDGE_RECORD_REQUIRED_FIELDS = (
     "authority_class",
     "relationships",
     "review_state",
+    "decision_provenance",
 )
 
 RETRIEVAL_CHUNK_REQUIRED_FIELDS = (

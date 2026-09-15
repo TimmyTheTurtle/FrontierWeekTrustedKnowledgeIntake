@@ -13,8 +13,25 @@ from .schemas import (
 )
 
 
-def _missing_fields(payload: dict[str, Any], required_fields: tuple[str, ...]) -> list[str]:
-    return [name for name in required_fields if name not in payload or payload[name] in (None, "")]
+def _missing_fields(
+    payload: dict[str, Any],
+    required_fields: tuple[str, ...],
+    *,
+    allow_none_fields: set[str] | None = None,
+) -> list[str]:
+    allow_none_fields = allow_none_fields or set()
+    missing: list[str] = []
+    for name in required_fields:
+        if name not in payload:
+            missing.append(name)
+            continue
+        value = payload[name]
+        if value == "":
+            missing.append(name)
+            continue
+        if value is None and name not in allow_none_fields:
+            missing.append(name)
+    return missing
 
 
 def validate_source_artifact(payload: dict[str, Any]) -> list[str]:
@@ -29,7 +46,14 @@ def validate_knowledge_record(
     human_decision_evidence: str | None = None,
 ) -> list[str]:
     """Return validation errors for knowledge records."""
-    errors = [f"missing field: {name}" for name in _missing_fields(payload, KNOWLEDGE_RECORD_REQUIRED_FIELDS)]
+    errors = [
+        f"missing field: {name}"
+        for name in _missing_fields(
+            payload,
+            KNOWLEDGE_RECORD_REQUIRED_FIELDS,
+            allow_none_fields={"decision_provenance"},
+        )
+    ]
 
     to_state = payload.get("review_state")
     if to_state and to_state not in REVIEW_STATES:
@@ -38,7 +62,8 @@ def validate_knowledge_record(
     if from_state and to_state and not can_transition(from_state, to_state):
         errors.append(f"invalid transition: {from_state} -> {to_state}")
 
-    if to_state and requires_human_decision(to_state) and not human_decision_evidence:
+    decision_evidence = human_decision_evidence or payload.get("decision_provenance")
+    if to_state and requires_human_decision(to_state) and not decision_evidence:
         errors.append(f"human decision evidence required for review_state: {to_state}")
 
     return errors
