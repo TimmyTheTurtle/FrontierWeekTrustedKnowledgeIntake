@@ -4,7 +4,20 @@ This file is the canonical, vendor-neutral source of standing instructions for a
 
 The Copilot compatibility adapter is [.github/copilot-instructions.md](.github/copilot-instructions.md). Keep that adapter small; add durable rules here once rather than duplicating them there.
 
-The recovered project handoff and initialization brief are preserved as attachments on [issue #1](https://github.com/TimmyTheTurtle/FrontierWeekTrustedKnowledgeIntake/issues/1). Read those attachments when reconstructing the original project context. They are bootstrap history, not current authoritative project facts; as the repository gains durable project documents, those documents become the authoritative source for current decisions.
+The recovered project handoff and initialization brief are preserved as attachments on [issue #1](https://github.com/TimmyTheTurtle/FrontierWeekTrustedKnowledgeIntake/issues/1). Read those attachments when reconstructing bootstrap context only.
+
+## Canonical project documents
+
+Read these repository documents before architectural or scope decisions:
+
+- `docs/PROJECT_BRIEF.md`
+- `docs/ROADMAP.md`
+- `docs/architecture/CONTEXT.md`
+- `docs/architecture/DATA_MODEL.md`
+- `docs/architecture/decisions/`
+- `docs/evaluation/STRATEGY.md`
+
+Bootstrap/history-only references remain under `docs/history/` and are non-authoritative when newer canonical docs disagree.
 
 ## Before acting
 
@@ -53,7 +66,7 @@ Do not provision or delete Azure resources, select paid models/regions, add exte
 
 ## Current execution path
 
-The repository is pre-initialization. The next authorized implementation sequence is:
+The repository is in initialization. The authorized implementation sequence is:
 
 1. Review and, if needed, revise the initialization brief and repository contract.
 2. Run a bounded repository initializer that creates context, schemas, minimal types, validation, and focused tests only.
