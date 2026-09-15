@@ -1,0 +1,6 @@
+# Python bytecode and test/tool caches should stay out of the repository.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
