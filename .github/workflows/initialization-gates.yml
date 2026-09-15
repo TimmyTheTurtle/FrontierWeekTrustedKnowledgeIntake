@@ -112,10 +112,7 @@ jobs:
     if: >-
       github.event_name == 'issue_comment' &&
       github.event.issue.number == 1 &&
-      github.event.issue.pull_request == null &&
-      (github.event.comment.body == 'APPROVE: PLAN' ||
-       github.event.comment.body == 'APPROVE: DOCUMENTATION' ||
-       github.event.comment.body == 'APPROVE: SCAFFOLDING')
+      github.event.issue.pull_request == null
     runs-on: ubuntu-latest
     steps:
       - name: Advance the approved initialization checkpoint
@@ -124,7 +121,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const approval = context.payload.comment.body.trim();
+            const body = context.payload.comment.body.trim();
             const issueAuthor = context.payload.issue.user.login;
 
             if (context.actor !== issueAuthor) {
@@ -132,43 +129,68 @@ jobs:
               return;
             }
 
-            const checkpoints = {
+            const approvalMap = {
               'APPROVE: PLAN': {
                 marker: '<!-- initialization-gate:phase-1 -->',
                 body: `<!-- initialization-gate:phase-1 -->
                 ## Initialization checkpoint 1 unlocked: documentation
 
-                The plan is approved. The coding agent may now create or revise only the documentation and repository-contract files listed in issue #1.
+                The plan is approved only after the agent has shown a reviewable diff and the human has explicitly reviewed it.
+
+                The coding agent may now create or revise only the documentation and repository-contract files listed in issue #1.
 
                 It must stop after that work and report:
 
                 DOCUMENTATION READY — AWAITING HUMAN REVIEW
 
-                The next human approval is APPROVE: DOCUMENTATION.`
+                The next human approval is APPROVE: DOCUMENTATION and must include review evidence such as REVIEWED: PR #n or REVIEWED: files changed.`
               },
               'APPROVE: DOCUMENTATION': {
                 marker: '<!-- initialization-gate:phase-2 -->',
                 body: `<!-- initialization-gate:phase-2 -->
                 ## Initialization checkpoint 2 unlocked: minimal scaffolding
 
-                The documentation is approved. The coding agent may now add only the minimal schemas, types, deterministic helpers, validation, and focused tests authorized by issue #1.
+                The documentation is approved only after the agent has shown a reviewable diff and the human has explicitly reviewed it.
+
+                The coding agent may now add only the minimal schemas, types, deterministic helpers, validation, and focused tests authorized by issue #1.
 
                 It must stop before deterministic Markdown ingestion and report:
 
                 INITIALIZATION SCAFFOLDING READY — AWAITING HUMAN REVIEW
 
-                The next human approval is APPROVE: SCAFFOLDING.`
+                The next human approval is APPROVE: SCAFFOLDING and must include review evidence such as REVIEWED: PR #n or REVIEWED: files changed.`
               },
               'APPROVE: SCAFFOLDING': {
                 marker: '<!-- initialization-gate:phase-3 -->',
                 body: `<!-- initialization-gate:phase-3 -->
                 ## Initialization checkpoint 3 unlocked: verify and report
 
-                The minimal scaffolding is approved. The coding agent may run the repository's available checks and provide the final initialization report.
+                The minimal scaffolding is approved only after the agent has shown a reviewable diff and the human has explicitly reviewed it.
+
+                The coding agent may run the repository's available checks and provide the final initialization report.
 
                 It must not begin Stage 1 implementation. A human must review the final diff and verification report before issue #1 is considered complete.`
               }
-            }[approval];
+            };
+
+            const normalized = body.replace(/\s+/g, ' ').trim();
+            const approval = Object.keys(approvalMap).find(key => normalized.startsWith(key));
+
+            if (!approval) {
+              core.setFailed(
+                'Approval comments must use the required form: `APPROVE: PLAN`, `APPROVE: DOCUMENTATION`, or `APPROVE: SCAFFOLDING`, followed by a review line such as `REVIEWED: PR #n` or `REVIEWED: files changed`.'
+              );
+              return;
+            }
+
+            if (!/\bREVIEWED:\s*(?:PR\s*#\d+|files changed|diff reviewed|reviewed patch)/i.test(normalized)) {
+              core.setFailed(
+                'The approval comment is missing review evidence. Add a line such as `REVIEWED: PR #n` or `REVIEWED: files changed` before advancing the checkpoint.'
+              );
+              return;
+            }
+
+            const checkpoints = approvalMap[approval];
 
             // Use the same marker/update pattern for each checkpoint comment.
             const comments = await github.paginate(github.rest.issues.listComments, {

@@ -11,6 +11,8 @@ The recovered project handoff and initialization brief are preserved as attachme
 - Inspect the repository, Git status, existing instructions, tests, and relevant documents before planning or editing.
 - Preserve existing user content. Do not assume an initializer has run.
 - Keep changes small, reviewable, reversible, and directly tied to the current milestone.
+- No agent may claim a phase is complete without showing the actual diff, the affected files, and the review evidence the human used to approve it.
+- A human approval is not a blank check for a mystery change. A checkpoint may advance only after the agent presents a reviewable patch and the issue author explicitly confirms that the change was reviewed.
 - Report uncertainty, missing credentials, blocked tools, and unresolved decisions instead of inventing facts or configuration.
 
 ## Tool-use priority
