@@ -4,7 +4,7 @@ This file is the canonical, vendor-neutral source of standing instructions for a
 
 The Copilot compatibility adapter is [.github/copilot-instructions.md](.github/copilot-instructions.md). Keep that adapter small; add durable rules here once rather than duplicating them there.
 
-The recovered project handoff is [docs/history/initial-chat.md](docs/history/initial-chat.md). Read it for the original product, competition, milestone, and boundary context. As the repository gains durable project documents, those documents become the authoritative source for current decisions; treat the handoff as historical context unless it is explicitly updated.
+The recovered project handoff and initialization brief are preserved as attachments on [issue #1](https://github.com/TimmyTheTurtle/FrontierWeekTrustedKnowledgeIntake/issues/1). Read those attachments when reconstructing the original project context. They are bootstrap history, not current authoritative project facts; as the repository gains durable project documents, those documents become the authoritative source for current decisions.
 
 ## Before acting
 
