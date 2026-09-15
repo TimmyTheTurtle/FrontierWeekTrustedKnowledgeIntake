@@ -1,11 +1,11 @@
 # Roadmap
 
-## Stage 0 — Repository initialization (current)
+## Stage 0 — Repository initialization (complete)
 - Establish canonical instructions and documentation baseline.
 - Define architecture boundaries, data model, ADRs, and evaluation strategy.
 - Stop before Stage 1 implementation.
 
-## Stage 1 — Deterministic ingestion baseline
+## Stage 1 — Deterministic ingestion baseline (next; not started)
 - Deterministically parse one Markdown/plain-text source.
 - Produce stable source-faithful chunks with structural provenance.
 - Validate schema output and repeatability with focused tests.

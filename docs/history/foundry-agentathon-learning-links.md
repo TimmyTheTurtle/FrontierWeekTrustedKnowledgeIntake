@@ -1,7 +1,6 @@
 # Microsoft Agent-a-Thon Learning Links
 
-Last checked: September 14, 2026  
-Microsoft Learn account checked: `klingenberg.d@outlook.com`
+Last checked: September 14, 2026
 
 This is the working list for preparing for the Microsoft Agent-a-Thon Level 3 Architect event. Checkboxes describe the current status in the Microsoft Learn profile, not merely whether a page has been opened.
 

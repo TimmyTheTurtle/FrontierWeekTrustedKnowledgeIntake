@@ -5,15 +5,15 @@ Build the Contextual Knowledge Operations Platform, starting with a bounded capa
 
 Trusted Knowledge Intake converts captured source material into a structured, provenance-preserving candidate knowledge record, compares it with approved knowledge, and requires explicit human approval before promotion.
 
-## Current scope (Initialization)
-This repository phase establishes durable project context and minimal repository contracts only.
+## Current scope (post-initialization)
+Repository initialization is complete. Stage 1 deterministic ingestion is next and has not started.
 
-In scope now:
+The completed foundation includes:
 - canonical instructions and adapter alignment;
 - product context, roadmap, architecture context, data model, ADRs, and evaluation strategy;
 - sanitized learning-links documentation.
 
-Out of scope now:
+Still out of scope until later stages:
 - ingestion implementation;
 - Intake Analyst / Knowledge Steward runtime agents;
 - RAG retrieval implementation;

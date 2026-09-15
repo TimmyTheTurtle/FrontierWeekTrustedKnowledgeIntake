@@ -66,19 +66,32 @@ Do not provision or delete Azure resources, select paid models/regions, add exte
 
 ## Current execution path
 
-The repository is in initialization. The authorized implementation sequence is:
+Repository initialization is complete; Stage 1 has not started. The authorized implementation sequence is:
 
-1. Review and, if needed, revise the initialization brief and repository contract.
-2. Run a bounded repository initializer that creates context, schemas, minimal types, validation, and focused tests only.
-3. Review the initializer's diff and verification report.
-4. Implement Stage 1 only: deterministic Markdown/plain-text ingestion with stable hashing, structural parsing, source-faithful chunks, structural provenance, schema validation, and repeatability tests.
-5. Add Foundry agents, monitoring, evaluation, workflow, RAG, and deployment only as later, evidenced milestones.
+1. Implement Stage 1 only: deterministic Markdown/plain-text ingestion with stable hashing, structural parsing, source-faithful chunks, structural provenance, schema validation, and repeatability tests.
+2. Add Foundry agents, monitoring, evaluation, workflow, RAG, and deployment only as later, evidenced milestones.
 
 Do not let a comprehensive brief become permission to build the whole platform immediately.
 
 ## Verification and reporting
 
 - Add or update tests and evaluation cases with behavior changes.
+- Unit tests must remain fast, deterministic, and local. Mock or fake database,
+  network, model, and Azure-resource boundaries; unit tests must not make real
+  external calls.
+- Keep integration tests explicitly separate from unit tests. They may exercise
+  real cross-component boundaries and run less frequently, with any required
+  credentials, cost, and cleanup controls documented before they are added.
 - Prefer narrow commands and structured output; document real commands only after they work.
 - Never claim a build, test, deployment, trace, evaluation, or authentication succeeded without direct verification.
 - End work with what changed, what was verified, what remains uncertain, and the next smallest useful action.
+
+## Proportionality and autonomy
+
+- Complete the approved task fully, but do not perform adjacent cleanup, speculative generalization, or future-stage work.
+- Prefer the smallest coherent implementation that satisfies the current acceptance criteria.
+- Do not introduce frameworks, abstractions, extension points, configuration layers, or generalized workflows without a demonstrated current need.
+- Within an approved scope, make routine, reversible implementation decisions without repeatedly asking for permission.
+- Stop and ask when a decision changes product behavior, architecture, public interfaces, cost, security, data handling, or the agreed scope.
+- Treat tests and implementation friction as architectural evidence. Report meaningful design pressure and propose a bounded adjustment rather than silently expanding the design.
+- When the acceptance criteria are satisfied and verified, stop. Record possible future improvements instead of implementing them.
