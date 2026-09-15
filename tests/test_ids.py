@@ -17,6 +17,11 @@ class StableIdTests(unittest.TestCase):
         payload = {"origin": "example.md"}
         self.assertNotEqual(stable_id("source", payload), stable_id("record", payload))
 
+    def test_stable_id_has_expected_format_and_length(self) -> None:
+        identifier = stable_id("source", {"origin": "example.md"})
+        self.assertTrue(identifier.startswith("source_"))
+        self.assertEqual(len(identifier), len("source_") + 16)
+
 
 if __name__ == "__main__":
     unittest.main()

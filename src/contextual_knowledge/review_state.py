@@ -10,6 +10,8 @@ HUMAN_DECISION_STATES = TERMINAL_REVIEW_STATES
 
 def can_transition(from_state: str, to_state: str) -> bool:
     """Return whether a transition is allowed by the initialization state model."""
+    if from_state == to_state:
+        return True
     return to_state in REVIEW_STATE_TRANSITIONS.get(from_state, ())
 
 

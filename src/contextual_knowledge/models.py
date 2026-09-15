@@ -40,6 +40,8 @@ class KnowledgeRecord:
 
 @dataclass(frozen=True)
 class RetrievalChunk:
+    """Source-faithful retrieval unit; only approved chunks are eligible for trusted retrieval."""
+
     chunk_id: str
     source_id: str
     parent_section_id: str
