@@ -98,9 +98,9 @@ if __name__ == "__main__":
 # - Canonical repository instructions:
 #   https://github.com/TimmyTheTurtle/FrontierWeekTrustedKnowledgeIntake/blob/main/AGENTS.md
 # - Project handoff:
-#   https://github.com/TimmyTheTurtle/FrontierWeekTrustedKnowledgeIntake/blob/main/initial-chat.md
+#   https://github.com/TimmyTheTurtle/FrontierWeekTrustedKnowledgeIntake/blob/main/docs/history/initial-chat.md
 # - Initialization brief:
-#   https://github.com/TimmyTheTurtle/FrontierWeekTrustedKnowledgeIntake/blob/main/foundry-knowledge-platform-agent-init.md
+#   https://github.com/TimmyTheTurtle/FrontierWeekTrustedKnowledgeIntake/blob/main/docs/history/foundry-knowledge-platform-agent-init.md
 # - GitHub Actions learning path:
 #   https://learn.microsoft.com/training/paths/github-actions/
 # - Implement GitHub Actions:
