@@ -1,0 +1,38 @@
+name: Discovery
+description: Record evidence-gathering work that may inform a later bounded implementation.
+title: "[Discovery] "
+labels: ["type:discovery"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Discovery collects evidence. It does not authorize implementation,
+        architecture changes, or promotion into trusted knowledge.
+  - type: textarea
+    id: question
+    attributes:
+      label: Question or observation
+      description: What needs to be understood or verified?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and source
+      description: Link or describe the source, report, fixture, test result, or reproducible observation.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected discovery outcome
+      description: State the evidence or recommendation this work should produce.
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals and boundaries
+      description: Say what this discovery must not expand into.
+    validations:
+      required: true
