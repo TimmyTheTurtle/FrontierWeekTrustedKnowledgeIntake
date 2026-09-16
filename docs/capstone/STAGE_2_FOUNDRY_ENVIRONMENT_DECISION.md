@@ -20,7 +20,7 @@ credentials, costs, data-handling requirements, and verification evidence.
 | Foundry account | `trusted-knowledge-intake-capstone-resource` | Verified read-only through Resource Graph. |
 | Foundry project | `trusted-knowledge-intake-capstone` | Reachable through Foundry MCP; no agents exist. |
 | Region | `eastus2` | Verified read-only through Resource Graph. |
-| Baseline model deployment | `capstone-gpt-5-mini`: `gpt-5-mini`, version `2025-08-07`, Global Standard pay-as-you-go, 1K TPM | Created by the human reviewer; Foundry MCP verified `Succeeded`. The default `Microsoft.DefaultV2` RAI policy applies. The previously proposed `gpt-4o-mini` version `2024-07-18` was rejected by the portal as deprecating. |
+| Baseline model deployment | `capstone-gpt-5-mini`: `gpt-5-mini`, version `2025-08-07`, Global Standard pay-as-you-go, 5K TPM and 5 requests per minute | Created and updated by the human reviewer; Foundry MCP verified `Succeeded`. The default `Microsoft.DefaultV2` RAI policy applies. The previously proposed `gpt-4o-mini` version `2024-07-18` was rejected by the portal as deprecating. |
 | Budget boundary | CA$10 monthly resource-group budget, with actual-cost alerts at 50%, 80%, and 100% | Verified through Azure CLI. Alerts send to the human reviewer's email. A budget is an alert threshold, not a guaranteed hard spend stop. |
 | Temporary notification exception | The existing Claims action group remains attached to the capstone budget alerts until the human reviewer deletes the separate Claims resource group. | Intentional human decision; do not modify either resource as part of this capstone. |
 | Data boundary | Synthetic or openly redistributable Markdown/plain text only; no private content or secrets. | Approved. |
