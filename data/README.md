@@ -22,6 +22,21 @@ first deterministic-ingestion slice.
 
 ### Derived test fixtures
 
+The full-text extracts below are exploratory analysis artifacts, not unit-test
+fixtures and not canonical sources. Each is generated from the corresponding
+PDF with `pypdf`'s per-page text extraction, with a level-one Markdown page
+anchor added to preserve page provenance. This method preserves extracted text
+but does not reconstruct PDF layout, visual figures, equations, or table
+semantics.
+
+- `samples/agentic-agile-v-2605.20456v1-full-extract.md` is the seven-page,
+  full-text extraction of the Agentic Agile-V paper.
+- `samples/agile-v-2602.20684v1-full-extract.md` is the nine-page, full-text
+  extraction of the Agile-V paper, *Agile V: A Compliance-Oriented Framework
+  for AI-Augmented Engineering - From Concept to Audit-Ready Delivery*.
+
+Both are CC BY 4.0 derivatives of their respective PDF source artifacts.
+
 - `samples/agentic-agile-v-overview.md` selects and reformats portions of the
   title, abstract, and introduction as Markdown. Line breaks were normalized;
   no claims were added.
