@@ -1,8 +1,9 @@
-# Test source artifacts
+# Source artifacts and fixtures
 
-This directory separates immutable raw source artifacts from Markdown fixtures
-derived for deterministic-ingestion tests. The fixtures are not the canonical
-source and must not replace it.
+This directory separates immutable raw source artifacts from derived Markdown
+artifacts. Derived artifacts are either exploratory analysis evidence or
+fixtures for deterministic-ingestion tests; neither replaces the canonical
+source.
 
 ## Agentic Agile-V
 
@@ -20,7 +21,23 @@ source and must not replace it.
 The raw PDF is retained unchanged. It is not an input format supported by the
 first deterministic-ingestion slice.
 
-### Derived test fixtures
+## Agile-V
+
+- **Canonical raw artifact:** `sources/agile-v-2602.20684v1.pdf`
+- **Title:** *Agile V: A Compliance-Oriented Framework for AI-Augmented
+  Engineering — From Concept to Audit-Ready Delivery*
+- **Authors:** Christopher Koch and Joshua A. Wellbrock
+- **Version:** arXiv:2602.20684v1, submitted February 24, 2026
+- **Canonical URL:** <https://arxiv.org/pdf/2602.20684v1>
+- **License:** [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+- **SHA-256:**
+  `232a601ae097250ebf5781ba8399ce557690e2df1b75d2be807b68d0ac8b8dd1`
+- **Retrieved:** September 16, 2026
+
+The raw PDF is retained unchanged. It is not an input format supported by the
+first deterministic-ingestion slice.
+
+## Exploratory analysis artifacts
 
 The full-text extracts below are exploratory analysis artifacts, not unit-test
 fixtures and not canonical sources. Each is generated from the corresponding
@@ -36,6 +53,8 @@ semantics.
   for AI-Augmented Engineering - From Concept to Audit-Ready Delivery*.
 
 Both are CC BY 4.0 derivatives of their respective PDF source artifacts.
+
+## Derived unit-test fixtures
 
 - `samples/agentic-agile-v-overview.md` selects and reformats portions of the
   title, abstract, and introduction as Markdown. Line breaks were normalized;

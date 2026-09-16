@@ -76,7 +76,7 @@ Inline bracketed citations occur throughout both documents, while their referenc
 
 ### 6. Cross-page continuity conflicts with page-only chunking
 
-The parser currently emits a page as a chunk. Native sections and tables cross those boundaries, so current chunks often divide a single semantic unit. Locations are derived-Markdown line ranges, not native section identities.
+The parser currently emits a page as a chunk. Native sections cross those boundaries, so current chunks can divide a single semantic unit. The observed tables are page-local; this corpus does not demonstrate a table crossing a page anchor. Locations are derived-Markdown line ranges, not native section identities.
 
 **Candidate:** drive future chunks from recognized source structure, retaining page anchors as secondary provenance. Associate multi-page continuation without joining unrelated neighboring material.
 
@@ -101,7 +101,7 @@ These are proposed test cases, not approved work:
 3. Detect table labels/captions and retain their raw body as an ordered table candidate without fabricating cells.
 4. Preserve figure labels/captions and associate a Markdown image/link when supplied; report a caption-only figure honestly.
 5. Preserve inline citation markers and bibliography entries without resolving them at parse time.
-6. Test a section and a table that span page anchors.
+6. Test a section that spans page anchors. Add a separate table-spanning-page test only after a source or synthetic fixture demonstrates that case.
 7. Emit deterministic extraction-quality findings for selected, documented patterns, never an automatic text repair.
 8. Verify that all derived blocks retain original Markdown ranges, heading context where known, source ID, and content hash.
 
