@@ -31,3 +31,11 @@ first deterministic-ingestion slice.
 
 Both files are CC BY 4.0 derivatives. Attribute Christopher Koch and link to
 the canonical URL and license whenever either fixture is redistributed.
+
+- `samples/agentic-agile-v-paper-components.md` is a compact, CC BY 4.0
+  derivative that exercises common research-paper components: front matter,
+  author text, abstract, nested sections, a numbered list, bullets, a quote,
+  an inline citation, and references.
+- `samples/agentic-agile-v-artifact-components.md` is a synthetic companion
+  fixture for a Markdown table, image reference, caption, and fenced example.
+  It contains no claims from the paper.

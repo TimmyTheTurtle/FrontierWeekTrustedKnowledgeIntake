@@ -1,8 +1,12 @@
 import unittest
 from dataclasses import asdict
+from pathlib import Path
 
 from contextual_knowledge.ingestion import ingest_markdown
 from contextual_knowledge.validation import validate_retrieval_chunk, validate_source_artifact
+
+
+SAMPLE_DIRECTORY = Path(__file__).parents[1] / "data" / "samples"
 
 
 class MarkdownIngestionTests(unittest.TestCase):
@@ -78,6 +82,61 @@ class MarkdownIngestionTests(unittest.TestCase):
         self.assertEqual(len(result.chunks), 1)
         self.assertEqual(result.chunks[0].heading_path, ("Parent",))
         self.assertEqual(result.chunks[0].content, "```markdown\n# Not a section\n```\n")
+
+    def test_paper_component_fixture_preserves_research_document_structure(self) -> None:
+        # Research-paper sources can contain metadata, nested sections, lists,
+        # quotations, citations, and references. In this baseline they remain
+        # source-faithful chunk content, with headings supplying provenance.
+        document = (SAMPLE_DIRECTORY / "agentic-agile-v-paper-components.md").read_text(
+            encoding="utf-8"
+        )
+        result = ingest_markdown(
+            document,
+            origin="data/samples/agentic-agile-v-paper-components.md",
+            captured_at="2026-09-15T00:00:00Z",
+            license_note="CC BY 4.0 derivative; see data/README.md",
+        )
+
+        self.assertEqual(result.chunks[0].heading_path, ())
+        self.assertIn(
+            ("Agentic Agile-V Component Sample", "I. Background", "B. Contributions"),
+            [chunk.heading_path for chunk in result.chunks],
+        )
+        chunk_text = "".join(chunk.content for chunk in result.chunks)
+        for component in (
+            "source_kind: research-paper structure",
+            "Independent Researcher",
+            "**Index Terms:**",
+            "1. A structured input package.",
+            "- Preserve the original captured text.",
+            "> Conversation may discover intent",
+            "[1] Example Author",
+        ):
+            self.assertIn(component, chunk_text)
+
+    def test_artifact_component_fixture_preserves_non_heading_markdown(self) -> None:
+        # Tables, image references, captions, and fenced examples are useful
+        # component types to observe. They must not be discarded or promoted
+        # into special meaning by deterministic Stage 1 ingestion.
+        document = (SAMPLE_DIRECTORY / "agentic-agile-v-artifact-components.md").read_text(
+            encoding="utf-8"
+        )
+        result = ingest_markdown(
+            document,
+            origin="data/samples/agentic-agile-v-artifact-components.md",
+            captured_at="2026-09-15T00:00:00Z",
+            license_note="synthetic fixture",
+        )
+
+        self.assertEqual(len(result.chunks), 3)
+        self.assertEqual(result.chunks[0].heading_path, ("Artifact Component Sample", "Evidence matrix"))
+        self.assertIn("| Risk class | Required evidence | Human gate |", result.chunks[0].content)
+        self.assertIn("![A fictional workflow diagram]", result.chunks[1].content)
+        self.assertIn("# This heading is an example", result.chunks[2].content)
+        self.assertEqual(
+            result.chunks[2].heading_path,
+            ("Artifact Component Sample", "Brief template"),
+        )
 
 
 if __name__ == "__main__":
