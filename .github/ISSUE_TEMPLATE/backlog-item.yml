@@ -1,0 +1,43 @@
+name: Delivery backlog item
+description: Define one bounded implementation, maintenance, or defect outcome.
+title: "[Backlog] "
+body:
+  - type: dropdown
+    id: work_type
+    attributes:
+      label: Work type
+      options:
+        - Feature
+        - Technical debt
+        - Bug
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: Describe the user, product, or engineering result.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Use observable, testable outcomes.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting evidence
+      description: Link the discovery report, ADR, test, or other reason this work is ready.
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals and dependencies
+      description: State excluded work, prerequisites, and decisions that still need human input.
+    validations:
+      required: true

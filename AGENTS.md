@@ -16,6 +16,7 @@ Read these repository documents before architectural or scope decisions:
 - `docs/architecture/DATA_MODEL.md`
 - `docs/architecture/decisions/`
 - `docs/evaluation/STRATEGY.md`
+- `docs/DELIVERY_WORKFLOW.md`
 
 Bootstrap/history-only references remain under `docs/history/` and are non-authoritative when newer canonical docs disagree.
 
@@ -53,7 +54,7 @@ For external systems, begin read-only. Use the exact repository, account, resour
 - No agent may promote its own output into trusted knowledge. Human approval is an explicit state transition.
 - Use deterministic code for hashing, parsing, exact matching, schema validation, access checks, and state transitions.
 - Use synthetic, openly licensed, or clearly redistributable data only. Never import private legacy-project or business content.
-- Keep GitHub-native SDLC automation, issue-to-PR orchestration, worktree management, automatic merging/releases, and private legacy projects out of scope.
+- Use GitHub Issues and the linked Project for manual planning and delivery tracking. Keep GitHub-native SDLC automation, issue-to-PR orchestration, worktree management, automatic merging/releases, and private legacy projects out of scope.
 
 ## Competition alignment
 

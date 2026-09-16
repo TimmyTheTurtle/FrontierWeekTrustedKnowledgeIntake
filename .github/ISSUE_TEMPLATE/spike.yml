@@ -1,0 +1,33 @@
+name: Technical spike
+description: Time-box a technical investigation before committing to a design or implementation.
+title: "[Spike] "
+labels: ["type:spike"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Decision question
+      description: What decision will this investigation make possible?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope and timebox
+      description: Identify the boundaries and the maximum investigation effort.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence to collect
+      description: Name the experiment, source, comparison, or test that will support the conclusion.
+    validations:
+      required: true
+  - type: textarea
+    id: exit_criteria
+    attributes:
+      label: Exit criteria
+      description: State what the closing recommendation must include.
+    validations:
+      required: true
