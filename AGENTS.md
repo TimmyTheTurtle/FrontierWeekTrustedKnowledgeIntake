@@ -54,6 +54,9 @@ For external systems, begin read-only. Use the exact repository, account, resour
 - No agent may promote its own output into trusted knowledge. Human approval is an explicit state transition.
 - Use deterministic code for hashing, parsing, exact matching, schema validation, access checks, and state transitions.
 - Use synthetic, openly licensed, or clearly redistributable data only. Never import private legacy-project or business content.
+- Evaluate data rights source by source, not by document category. Official, unannotated public legal materials may be eligible when their source, jurisdiction, copyright status, and reuse terms are recorded; public availability alone does not establish permission to reuse a privately authored filing, policy, contract, commercial compilation, annotation, translation, or explanatory material.
+- Never submit, display, upload, prompt with, trace, or include in supporting material any confidential, personal, employer-owned, client-owned, proprietary, or otherwise restricted content. Treat competition videos, screenshots, prompts, traces, supporting files, and shared activity pages as disclosure surfaces.
+- When an external source is used, record its origin, specific reuse basis or license, and any attribution requirement in the source provenance. If that basis cannot be verified, use an original synthetic substitute and report the limitation rather than assuming permission.
 - Use GitHub Issues and the linked Project for manual planning and delivery tracking. Keep GitHub-native SDLC automation, issue-to-PR orchestration, worktree management, automatic merging/releases, and private legacy projects out of scope.
 
 ## Competition alignment
